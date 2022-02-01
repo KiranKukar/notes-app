@@ -5,6 +5,7 @@
 // on Mac (using Chrome), use Option+Command+J to open the console and see this message.
 
 const NotesModel = require("./notesModel")
+const NotesView = require("./notesView")
 const notes = new NotesModel;
 
 console.log('The notes are noting');
