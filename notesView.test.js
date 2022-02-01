@@ -27,4 +27,28 @@
     expect(document.getElementsByClassName('note').length).toBe(2)
     //expect(document.querySelectorAll('div.note')).toBe(2); 
   });
+
+   it('users adds note on browser and it is displayed', () => {
+     // arrange
+     const notesModel = new NotesModel();
+     const notesView = new NotesView(notesModel);
+
+     document.body.innerHTML = fs.readFileSync('./index.html');
+     const inputEL = document.querySelector('#new-note');
+     inputEL.value = 'notey note'
+     const buttonEL = document.querySelector('#add-note');
+     buttonEL.click();
+
+     // act
+    
+     // notesView.displayNotes();
+
+     // assert
+     expect(document.querySelectorAll('div.note').length).toEqual(1);
+     expect(document.querySelectorAll('div.note')[0].innerText).toEqual('notey note');
+     // expect(document.getElementsByClassName('note').length).toBe(3)
+     
+   });
+
+   
 });

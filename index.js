@@ -7,6 +7,10 @@
 const NotesModel = require("./notesModel")
 const NotesView = require("./notesView")
 const notes = new NotesModel;
+const view = new NotesView(notes);
+
+// notes.addNote('example exemplar');
+view.displayNotes();
 
 console.log('The notes are noting');
 console.log(notes.getNotes());
