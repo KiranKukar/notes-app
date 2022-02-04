@@ -6,11 +6,14 @@
 
 const NotesModel = require("./notesModel")
 const NotesView = require("./notesView")
-const notes = new NotesModel;
-const view = new NotesView(notes);
+const NotesApi = require('./notesApi');
 
-// notes.addNote('example exemplar');
-view.displayNotes();
+const api = new NotesApi();
+const model = new NotesModel();
+const view = new NotesView(model, api);
 
-console.log('The notes are noting');
-console.log(notes.getNotes());
+api.getRepoInfo((notes) => {
+  // This method is new — you'll need to add it to the model class
+  model.setNotes(notes);
+  view.displayNotes();
+});

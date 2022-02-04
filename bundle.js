@@ -20,6 +20,11 @@
         reset() {
           this.notes = [];
         }
+        setNotes(notes) {
+          notes.forEach((note) => {
+            this.notes.push(note);
+          });
+        }
       };
       module.exports = NotesModel2;
     }
@@ -29,17 +34,22 @@
   var require_notesView = __commonJS({
     "notesView.js"(exports, module) {
       var NotesView2 = class {
-        constructor(notesModel) {
+        constructor(notesModel, notesApi) {
           this.notesModel = notesModel;
+          this.notesApi = notesApi;
           this.mainContainerEl = document.querySelector("#main-container");
           document.querySelector("#add-note").addEventListener("click", () => {
             const newNote = document.querySelector("#new-note").value;
             this.addNote(newNote);
+            document.querySelector("#new-note").value = "";
           });
         }
         displayNotes() {
-          const notes2 = this.notesModel.getNotes();
-          notes2.map((note) => {
+          document.querySelectorAll(".note").forEach((element) => {
+            element.remove();
+          });
+          const notes = this.notesModel.getNotes();
+          notes.map((note) => {
             const noteEl = document.createElement("div");
             noteEl.className = "note";
             noteEl.innerText = note;
@@ -48,6 +58,7 @@
         }
         addNote(newNote) {
           this.notesModel.addNote(newNote);
+          this.notesApi.createNote(newNote);
           this.displayNotes();
         }
       };
@@ -55,12 +66,45 @@
     }
   });
 
+  // notesApi.js
+  var require_notesApi = __commonJS({
+    "notesApi.js"(exports, module) {
+      var NotesApi2 = class {
+        getRepoInfo(callback) {
+          fetch("http://localhost:3000/notes").then((response) => response.json()).then((data) => {
+            callback(data);
+          }).catch((error) => {
+            console.error("Error:", error);
+          });
+        }
+        createNote(note) {
+          const noteAdd = { content: note };
+          fetch("http://localhost:3000/notes", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(noteAdd)
+          }).then((response) => response.json()).then((data) => {
+            console.log("Success:", data);
+          }).catch((error) => {
+            console.error("Error:", error);
+          });
+        }
+      };
+      module.exports = NotesApi2;
+    }
+  });
+
   // index.js
   var NotesModel = require_notesModel();
   var NotesView = require_notesView();
-  var notes = new NotesModel();
-  var view = new NotesView(notes);
-  view.displayNotes();
-  console.log("The notes are noting");
-  console.log(notes.getNotes());
+  var NotesApi = require_notesApi();
+  var api = new NotesApi();
+  var model = new NotesModel();
+  var view = new NotesView(model, api);
+  api.getRepoInfo((notes) => {
+    model.setNotes(notes);
+    view.displayNotes();
+  });
 })();
